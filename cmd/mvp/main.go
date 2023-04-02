@@ -1,6 +1,7 @@
 package main
 
-// Exercise -- a program to exercise the simplest/stupidest possible stupidestCache.
+// MVP  -- a program to exercise the mvpCache.
+//	NOT YET IMPLEMENTED
 
 import (
 	"encoding/csv"
