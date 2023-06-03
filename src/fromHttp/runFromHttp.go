@@ -24,7 +24,7 @@ func Run() {
 		defer c.Close()
 		h.getOperation(w, r)
 	})
-	err := http.ListenAndServe(":80", mux)
+	err := http.ListenAndServe(":8080", mux)
 	if errors.Is(err, http.ErrServerClosed) {
 		// successful exit
 	} else if err != nil {

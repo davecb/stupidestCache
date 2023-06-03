@@ -79,7 +79,7 @@ func (s sCache) stupid() {
 		select {
 		case k := <-s.ask:
 			var v ve
-			// when given a key, reply with a value and an exists falg
+			// when given a key, reply with a value and an exists flag
 			val, exists := s.m[k]
 			v.value = val
 			v.exists = exists

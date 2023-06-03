@@ -17,29 +17,26 @@ var eBlank = errors.New("csv record was blank")
 
 // main -- get options and commands
 func main() {
-	var daemonic = flag.Bool("daemonic", false, "bring up a web server on port 80")
+	var daemonic = flag.Bool("daemonic", false, "bring up a web server on port 8080")
 	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime) // show fromFile:line in logs
 
 	flag.Parse()
 	if *daemonic {
 		// run it as a deamon
 		fromHttp.Run()
-	} else {
-		if flag.NArg() < 1 {
-			fmt.Fprint(os.Stderr, "You must supply a load.csv fromFile\n") //nolint
-			usage()
-		}
-
-		filename := flag.Arg(0)
-		fromFile.Run(filename)
-
+		return
 	}
-
+	if flag.NArg() < 1 {
+		fmt.Fprint(os.Stderr, "You must supply a load.csv file\n") //nolint
+		usage()
+		os.Exit(1)
+	}
+	filename := flag.Arg(0)
+	fromFile.Run(filename)
 }
 
 func usage() {
 	//nolint
 	fmt.Fprint(os.Stderr, "Usage: stupid fromFile.csv") //nolint
 	flag.PrintDefaults()
-	os.Exit(1)
 }
