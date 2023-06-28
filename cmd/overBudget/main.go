@@ -7,7 +7,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/davecb/stupidestCache/src/mvp"
+	"github.com/davecb/stupidestCache/src/overBudget"
 	"io"
 	"log"
 	"os"
@@ -37,7 +37,7 @@ func exercise(filename string) {
 	var record []string
 	var operation, key, value string
 	var err error
-	var cache = mvp.New()
+	var cache = overBudget.New()
 	defer cache.Close()
 
 	f, err := os.Open(filename)
