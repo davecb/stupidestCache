@@ -1,7 +1,6 @@
 package main
 
 // MVP  -- a program to exercise the mvpCache.
-//	NOT YET IMPLEMENTED
 
 import (
 	"encoding/csv"
