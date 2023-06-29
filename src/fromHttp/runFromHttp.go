@@ -5,6 +5,7 @@ package fromHttp
 import (
 	"errors"
 	"fmt"
+	"github.com/davecb/stupidestCache/src/common"
 	"github.com/davecb/stupidestCache/src/fromFile"
 	"github.com/davecb/stupidestCache/src/stupidestCache"
 	"io"
@@ -17,7 +18,7 @@ func Run() {
 	// run it as a deamon
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		var c stupidestCache.Cache
+		var c common.Cache
 		var h httpOp
 
 		h.cache = stupidestCache.New()
@@ -35,7 +36,7 @@ func Run() {
 // code for a web service
 
 type httpOp struct {
-	cache stupidestCache.Cache
+	cache common.Cache
 }
 
 // getOperation will do the server get stuff

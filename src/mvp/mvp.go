@@ -1,49 +1,53 @@
 package mvp
 
-// Cache is the kind of cache we are making available over http.
-// This one is the stupidest: there will be smarter ones.
-type Cache interface {
-	// Get returns a string and a presence flag
-	Get(key string) (string, bool)
-	// Put returns a sucess/failure indication
-	Put(key, value string) error
-	// Close shuts the cache down
-	Close()
-}
+import (
+	"github.com/davecb/stupidestCache/src/common"
+	"time"
+)
 
-// MVP Cache -- a program to provide a not as simple cache for a
+// MVP Cache -- a library to provide a not-as-simple cache for a
 //	particular task, to compare with a performance target
 
 type mvpCache struct {
-	m      map[string]string // the cache itself, not locked
-	ask    chan string       // a channel for asking about keys
-	answer chan ve           // a channel for returning values
-	update chan kv           // a channel for updating keys & values
-	done   chan bool         // and a channel for shutting down
+	m      map[string]ve // the cache itself, not locked
+	ttl    time.Duration // time to live for cache entries
+	ask    chan string   // a channel for asking about keys
+	answer chan ve       // a channel for returning values
+	update chan kv       // a channel for updating keys & values
+	refill chan kv       // a channel to ask for refills on
+	done   chan bool     // and a channel for shutting down
 }
+
+// kv is just a key and value.
 type kv struct {
 	k string
 	v string
 }
 
+// ve is a value, a place to put the "exists" response from the map call
+// and a last-updated time.
 type ve struct {
-	value  string
-	exists bool
+	value   string
+	exists  bool
+	updated time.Time
 }
 
-// New creates a new stupidest cache
-func New() Cache {
+// New creates a new mvp cache
+func New() common.Cache {
 	var s mvpCache
 
 	if s.m != nil {
 		panic("you can't New() me twice, Dave! Die")
 	}
-	s.m = make(map[string]string)
+	s.ttl = time.Minute * 1
+	s.m = make(map[string]ve)
 	s.ask = make(chan string)
 	s.answer = make(chan ve)
 	s.update = make(chan kv)
+	s.refill = make(chan kv)
 	s.done = make(chan bool)
-	go s.stupid()
+	go s.mvp()
+	go s.refiller()
 	return s
 }
 
@@ -72,21 +76,63 @@ func (s mvpCache) Close() {
 	s.m = nil     // smash the map, to force freeing
 }
 
-// stupid -- the implementation
-func (s mvpCache) stupid() {
+// mvp -- the implementation, running as a goroutine
+func (s mvpCache) mvp() {
 
 	for {
 		select {
 		case k := <-s.ask:
-			var v ve
 			// when given a key, reply with a value and an exists flag
+
+			var v ve
 			val, exists := s.m[k]
-			v.value = val
+			v.value = val.value
 			v.exists = exists
 			s.answer <- v
+
+			// After replying, check TTL and refresh if stale
+			if v.updated.IsZero() || time.Since(v.updated) > s.ttl {
+				s.getFromL2(k)
+			}
+
 		case kv := <-s.update:
 			// when given a key and value, replace both
-			s.m[kv.k] = kv.v
+			var v ve
+			v.value = kv.v
+			v.updated = time.Now()
+			s.m[kv.k] = v
+
+		case <-s.done:
+			// when given a done indication, quit
+			return
+		}
+	}
+}
+
+func (s mvpCache) getFromL2(k string) {
+	var x kv
+	var y ve
+
+	x.v = k
+	s.refill <- x  // call the refiller
+	x = <-s.refill // get the response
+	y.value = x.v
+	y.updated = time.Now()
+	s.m[k] = y
+}
+
+// refiller, the call to the L2 cache, running as a goroutine
+func (s mvpCache) refiller() {
+	var v kv
+
+	for {
+		select {
+		case k := <-s.refill:
+			// pretend to ask somebody for a new value here
+			v.k = k.k
+			v.v = "bogus"
+			s.refill <- v
+
 		case <-s.done:
 			// when given a done indication, quit
 			return

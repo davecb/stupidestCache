@@ -1,15 +1,6 @@
 package stupidestCache
 
-// Cache is the kind of cache we are making available over http.
-// This one is the stupidest: there will be smarter ones.
-type Cache interface {
-	// Get returns a string and a presence flag
-	Get(key string) (string, bool)
-	// Put returns a sucess/failure indication
-	Put(key, value string) error
-	// Close shuts the cache down
-	Close()
-}
+import "github.com/davecb/stupidestCache/src/common"
 
 // Stupidest Cache -- a program to provide the simplest possible cache for a
 //	particular task, to serve as a performance target
@@ -32,7 +23,7 @@ type ve struct {
 }
 
 // New creates a new stupidest cache
-func New() Cache {
+func New() common.Cache {
 	var s sCache
 
 	if s.m != nil {

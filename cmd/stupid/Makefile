@@ -1,5 +1,7 @@
+budget:
+	 cd ../../src/stupidestCache; go test -bench=. -count 25 -run=^# | tee s.csv
 
-all:
+minimal:
 	go run main.go testdata/minimal.csv 
 fail:
 	-go run main.go testdata/fail.csv 

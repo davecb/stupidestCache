@@ -7,7 +7,7 @@ performance of cache offerings
 * stupidestCache is probably as simple as you can get, 
 and  faster than any credible cache. It has lots of limitations.
 * mvpCache has a time field, so it can be used in a more normal 
-* configuration, such as in front of an L2 cache
+configuration, such as in front of an L2 cache
 
 Both are loadable via a .csv file, and exercisable via a web service.    
 The latter is used by [Play it Again, Sam](https://github.com/davecb/Play-it-Again-Sam) to 
