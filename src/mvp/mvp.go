@@ -87,7 +87,8 @@ func (s mvpCache) mvp() {
 			var v ve
 			val, exists := s.m[k]
 			v.value = val.value
-			v.exists = exists
+			v.updated = val.updated
+			v.exists = exists // if false, the values above will be the defaults
 			s.answer <- v
 
 			// After replying, check TTL and refresh if stale
@@ -112,7 +113,7 @@ func (s mvpCache) mvp() {
 func (s mvpCache) getFromL2(k string) {
 	var x kv
 	var y ve
-
+	
 	x.v = k
 	s.refill <- x  // call the refiller
 	x = <-s.refill // get the response
