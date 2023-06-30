@@ -67,3 +67,13 @@ func BenchmarkMVP(b *testing.B) {
 		cache.Get("fred")
 	}
 }
+
+func TestCrash(t *testing.T) {
+	var cache = New()
+	defer cache.Close()
+
+	cache.Put("fred", "wilma")
+	for i := 0; i < 2; i++ {
+		cache.Get("fred")
+	}
+}
