@@ -5,11 +5,12 @@ package fromFile
 import (
 	"encoding/csv"
 	"errors"
-	"github.com/davecb/stupidestCache/src/stupidestCache"
 	"io"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/davecb/stupidestCache/src/stupidestCache"
 )
 
 var eShort = errors.New("csv record was too short")
@@ -30,13 +31,12 @@ func exercise(filename string) {
 	var operation, key, value string
 	var err error
 	var cache = stupidestCache.New()
-	defer cache.Close()
+	// Do not close cache until done
 
 	f, err := os.Open(filename)
 	if err != nil {
 		log.Fatalf("Error opening %s: %s, halting.", filename, err)
 	}
-	defer f.Close() // nolint
 
 	r := csv.NewReader(f)
 	r.Comma = ' '

@@ -7,11 +7,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/davecb/stupidestCache/src/mvp"
 	"io"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/davecb/stupidestCache/src/mvp"
 )
 
 var eShort = errors.New("csv record was too short")
@@ -38,7 +39,6 @@ func exercise(filename string) {
 	var operation, key, value string
 	var err error
 	var cache = mvp.New()
-	defer cache.Close()
 
 	f, err := os.Open(filename)
 	if err != nil {

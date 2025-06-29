@@ -5,12 +5,13 @@ package fromHttp
 import (
 	"errors"
 	"fmt"
-	"github.com/davecb/stupidestCache/src/common"
-	"github.com/davecb/stupidestCache/src/fromFile"
-	"github.com/davecb/stupidestCache/src/stupidestCache"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/davecb/stupidestCache/src/common"
+	"github.com/davecb/stupidestCache/src/fromFile"
+	"github.com/davecb/stupidestCache/src/stupidestCache"
 )
 
 func Run() {
@@ -18,11 +19,9 @@ func Run() {
 	// run it as a deamon
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		var c common.Cache
 		var h httpOp
 
 		h.cache = stupidestCache.New()
-		defer c.Close()
 		h.getOperation(w, r)
 	})
 	err := http.ListenAndServe(":8080", mux)

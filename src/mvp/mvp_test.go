@@ -2,6 +2,7 @@ package mvp
 
 import (
 	"testing"
+	"time"
 )
 
 func TestMVP(t *testing.T) {
@@ -75,5 +76,18 @@ func TestCrash(t *testing.T) {
 	cache.Put("fred", "wilma")
 	for i := 0; i < 2; i++ {
 		cache.Get("fred")
+	}
+}
+
+// Test_Benchmark runs the benchmark as a unit test and reports failures
+const nanos = 200
+
+func Test_Benchmark(t *testing.T) {
+	result := testing.Benchmark(BenchmarkMVP)
+	t.Logf("Benchmark ran %d iterations", result.N)
+	t.Logf("Average time per operation: %v", result.T/time.Duration(result.N))
+	avgTime := result.T / time.Duration(result.N)
+	if avgTime > time.Nanosecond*nanos {
+		t.Errorf("Function too slow: %v per operation, %v expected", avgTime, time.Nanosecond*nanos)
 	}
 }

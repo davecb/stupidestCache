@@ -7,11 +7,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/davecb/stupidestCache/src/overBudget"
 	"io"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/davecb/stupidestCache/src/overBudget"
 )
 
 var eShort = errors.New("csv record was too short")
@@ -44,7 +45,6 @@ func exercise(filename string) {
 	if err != nil {
 		log.Fatalf("Error opening %s: %s, halting.", filename, err)
 	}
-	defer f.Close() // nolint
 
 	r := csv.NewReader(f)
 	r.Comma = ' '

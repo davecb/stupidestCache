@@ -1,8 +1,9 @@
 package mvp
 
 import (
-	"github.com/davecb/stupidestCache/src/common"
 	"time"
+
+	"github.com/davecb/stupidestCache/src/common"
 )
 
 // MVP Cache -- a library to provide a not-as-simple cache for a
@@ -83,7 +84,6 @@ func (s mvpCache) mvp() {
 		select {
 		case k := <-s.ask:
 			// when given a key, reply with a value and an exists flag
-
 			var v ve
 			val, exists := s.m[k]
 			v.value = val.value
@@ -113,7 +113,7 @@ func (s mvpCache) mvp() {
 func (s mvpCache) getFromL2(k string) {
 	var x kv
 	var y ve
-	
+
 	x.v = k
 	s.refill <- x  // call the refiller
 	x = <-s.refill // get the response

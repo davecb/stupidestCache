@@ -6,10 +6,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/davecb/stupidestCache/src/fromFile"
-	"github.com/davecb/stupidestCache/src/fromHttp"
 	"log"
 	"os"
+
+	"github.com/davecb/stupidestCache/src/fromFile"
+	"github.com/davecb/stupidestCache/src/fromHttp"
 )
 
 var eShort = errors.New("csv record was too short")
@@ -21,18 +22,22 @@ func main() {
 	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime) // show fromFile:line in logs
 
 	flag.Parse()
-	if *daemonic {
-		// run it as a deamon
-		fromHttp.Run()
-		return
-	}
-	if flag.NArg() < 1 {
+
+	if flag.NArg() < 1 && !*daemonic {
 		fmt.Fprint(os.Stderr, "You must supply a load.csv file\n") //nolint
 		usage()
 		os.Exit(1)
 	}
-	filename := flag.Arg(0)
-	fromFile.Run(filename)
+	// In all cases, interpret all the files on the command line
+	for i := range flag.Args() {
+		fromFile.Run(flag.Arg(i))
+	}
+
+	if *daemonic {
+		// run it as a daemon after any files
+		fromHttp.Run()
+		return
+	}
 }
 
 func usage() {
