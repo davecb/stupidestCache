@@ -1,6 +1,7 @@
 package mvp
 
 import (
+	"flag"
 	"testing"
 	"time"
 )
@@ -80,14 +81,19 @@ func TestCrash(t *testing.T) {
 }
 
 // Test_Benchmark runs the benchmark as a unit test and reports failures
-const nanos = 200
-
 func Test_Benchmark(t *testing.T) {
 	result := testing.Benchmark(BenchmarkMVP)
 	t.Logf("Benchmark ran %d iterations", result.N)
 	t.Logf("Average time per operation: %v", result.T/time.Duration(result.N))
+	t.Logf("Budgeted time per operation: % v", time.Nanosecond*time.Duration(budget))
 	avgTime := result.T / time.Duration(result.N)
-	if avgTime > time.Nanosecond*nanos {
-		t.Errorf("Function too slow: %v per operation, %v expected", avgTime, time.Nanosecond*nanos)
+	if avgTime > time.Nanosecond*time.Duration(budget) {
+		t.Errorf("Function too slow: %v per operation, %v expected", avgTime, time.Nanosecond*time.Duration(budget))
 	}
+}
+
+// init allows us to pass in the budget as an option on the command-line.
+var budget int // time budget in nanoseconds
+func init() {
+	flag.IntVar(&budget, "budget", 200, "time budget")
 }
